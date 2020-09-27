@@ -2,6 +2,7 @@ package hashicups
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 
 	hc "github.com/hashicorp-demoapp/hashicups-client-go"
@@ -74,4 +75,19 @@ func testAccCheckHashicupsOrderExists(n string) resource.TestCheckFunc {
 
 		return nil
 	}
+}
+
+func TestAccResourceOrderCreateMultiStep(t *testing.T) {
+	steps := []resource.TestStep{}
+	for i := 0; i < 100; i++ {
+		steps = append(steps, resource.TestStep{
+			Config: testAccCheckHashicupsOrderConfigBasic("1", strconv.Itoa(i+1)),
+		})
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps:     steps,
+	})
 }
